@@ -239,13 +239,16 @@ describe('mount(path, app)', function () {
 })
 
 describe('mount(/prefix)', function () {
-  var app = new Koa()
+  let server
+  before(() => {
+    const app = new Koa()
 
-  app.use(mount('/prefix', function (ctx) {
-    ctx.status = 204
-  }))
+    app.use(mount('/prefix', function (ctx) {
+      ctx.status = 204
+    }))
 
-  var server = app.listen()
+    server = app.listen()
+  })
 
   it('should not match /kljasdf', function (done) {
     request(server)
@@ -279,13 +282,16 @@ describe('mount(/prefix)', function () {
 })
 
 describe('mount(/prefix/)', function () {
-  var app = new Koa()
+  let server
+  before(() => {
+    var app = new Koa()
 
-  app.use(mount('/prefix/', function (ctx) {
-    ctx.status = 204
-  }))
+    app.use(mount('/prefix/', function (ctx) {
+      ctx.status = 204
+    }))
 
-  var server = app.listen()
+    server = app.listen()
+  })
 
   it('should not match /kljasdf', function (done) {
     request(server)
@@ -319,53 +325,81 @@ describe('mount(/prefix/)', function () {
 })
 
 describe('mount(/prefix, app, preserve=true)', () => {
+  const APP_CONTEXT = 'app context'
+  const MOUNTED_CONTEXT = 'mounted context'
+
   it('should find its context props', async () => {
+    const app = new Koa()
+    app.context.a = APP_CONTEXT
+
     const mounted = new Koa()
-    mounted.context.a = 1
+    mounted.context.a = MOUNTED_CONTEXT
     mounted.use(async (ctx) => {
-      ctx.a.should.equal(1)
+      ctx.a.should.equal(MOUNTED_CONTEXT)
       ctx.status = 204
     })
+    mounted.name = 'mounted app'
 
-    const app = new Koa()
-    app.context.a = 2
-    app.use(mount('/a', mounted, true))
+    app.use(mount('/mounted', mounted, true))
     app.use(async (ctx) => {
-      ctx.a.should.equal(2)
+      ctx.a.should.equal(APP_CONTEXT)
       ctx.status = 200
     })
 
     const server = app.listen()
 
     await request(server)
-    .get('/a/b')
-    .expect(204)
+      .get('/mounted/test')
+      .expect(204)
 
     await request(server)
-    .get('/c/d')
-    .expect(200)
+      .get('/app/test')
+      .expect(200)
+  })
+  it('should accept a list of preserved properties', async () => {
+    const app = new Koa()
+    app.context.a = APP_CONTEXT
+
+    const mounted = new Koa()
+    mounted.use(async (ctx) => {
+      ctx.a.should.equal(APP_CONTEXT)
+      ctx.status = 200
+    })
+    mounted.name = 'mounted app'
+
+    app.use(mount('/mounted', mounted, ['a']))
+
+    const server = app.listen()
+
+    await request(server)
+      .get('/mounted/test')
+      .expect(200)
   })
 })
 
 describe('mount(/prefix) multiple', () => {
-  const app = new Koa()
+  let server
 
-  app.use(mount('/a', async (ctx) => {
-    ctx.assert.equal('/a', ctx.path, 404)
-    ctx.status = 204
-  }))
+  before(() => {
+    const app = new Koa()
 
-  app.use(mount('/b', async (ctx) => {
-    ctx.assert.equal('/b', ctx.path, 404)
-    ctx.status = 204
-  }))
+    app.use(mount('/a', async (ctx) => {
+      ctx.assert.equal('/a', ctx.path, 404)
+      ctx.status = 204
+    }))
 
-  app.use(mount('/c', async (ctx) => {
-    ctx.assert.equal('/c', ctx.path, 404)
-    ctx.status = 204
-  }))
+    app.use(mount('/b', async (ctx) => {
+      ctx.assert.equal('/b', ctx.path, 404)
+      ctx.status = 204
+    }))
 
-  const server = app.listen()
+    app.use(mount('/c', async (ctx) => {
+      ctx.assert.equal('/c', ctx.path, 404)
+      ctx.status = 204
+    }))
+
+    server = app.listen()
+  })
 
   it('should serve all the right mounted paths', async () => {
     await request(server)

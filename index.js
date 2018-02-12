@@ -60,6 +60,11 @@ function mount (prefix, app, preserve) {
       // to be able to send response of the mounted app
       newCtx.request = ctx.request
       newCtx.response = ctx.response
+      if (Array.isArray(preserve)) {
+        preserve.forEach((prop) => {
+          newCtx[prop] = ctx[prop]
+        })
+      }
     }
 
     newCtx.mountPath = prefix

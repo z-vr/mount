@@ -8,14 +8,18 @@ const mount = require('..')
 
 const root = path.resolve(__dirname, '..')
 
-const app = new Koa()
-
-app.use(mount('/examples', serve(path.resolve(root, 'examples'))))
-app.use(mount('/test', serve(path.resolve(root, 'test'))))
-
-const request = supertest.agent(app.listen())
-
 describe('Acceptance: Multiple Mounts', () => {
+  let request
+
+  before(() => {
+    const app = new Koa()
+
+    app.use(mount('/examples', serve(path.resolve(root, 'examples'))))
+    app.use(mount('/test', serve(path.resolve(root, 'test'))))
+
+    request = supertest.agent(app.listen())
+  })
+
   it('should serve /examples', () => (
     request
     .get('/examples/cascade.js')
