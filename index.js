@@ -25,7 +25,7 @@ module.exports = mount
  * @api public
  */
 
-function mount(prefix, app, preserve) {
+function mount (prefix, app, preserve) {
   if (typeof prefix !== 'string') {
     preserve = app
     app = prefix
@@ -53,13 +53,13 @@ function mount(prefix, app, preserve) {
     debug('mount %s %s -> %s', prefix, name, newPath)
     if (!newPath) return await upstream()
 
-    let newCtx = ctx;
+    let newCtx = ctx
     if (preserve) {
-      newCtx = app.createContext(ctx.req, ctx.res);
+      newCtx = app.createContext(ctx.req, ctx.res)
       // use the same instance of Koa Request and Response on both ctx
       // to be able to send response of the mounted app
-      newCtx.request = ctx.request;
-      newCtx.response = ctx.response;
+      newCtx.request = ctx.request
+      newCtx.response = ctx.response
     }
 
     newCtx.mountPath = prefix
