@@ -1,10 +1,7 @@
-
-'use strict'
-
 var request = require('supertest')
-var mount = require('..')
 var Koa = require('koa')
 require('should')
+var mount = require('..')
 
 describe('mount(app)', function () {
   it('should mount at /', function (done) {

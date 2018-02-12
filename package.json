@@ -31,7 +31,7 @@
   },
   "scripts": {
     "lint": "eslint --fix .",
-    "test": "NODE_ENV=test mocha --reporter spec",
+    "test": "NODE_ENV=test mocha --reporter spec --exit",
     "test-cov": "NODE_ENV=test istanbul cover ./node_modules/.bin/_mocha",
     "test-travis": "NODE_ENV=test istanbul cover ./node_modules/.bin/_mocha --report lcovonly"
   },
