@@ -1,7 +1,7 @@
 {
-  "name": "@zavr/koa-mount",
+  "name": "koa-mount",
   "description": "Mounting middleware for koa",
-  "repository": "koajs/mount",
+  "repository": "https://github.com/z-vr/mount",
   "version": "3.1.0",
   "keywords": [
     "koa",
